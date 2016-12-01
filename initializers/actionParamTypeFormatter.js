@@ -11,54 +11,54 @@
 
 
 module.exports = {
-  initialize: function(api, next) {
-    // set action middleware
-    var middleware = {
-      name: 'ah-swagger-material-ui',
-      global: true,
-      preProcessor: function(data, next) {
-        var inputs = data.actionTemplate.inputs;
-        for (var p of Object.keys(inputs)) {
-          var input = inputs[p];
-          if (!input.hasOwnProperty('formatter') && input.hasOwnProperty('type') && data.params.hasOwnProperty(p) && (typeof data.params[p] !== input.type)) {
-            console.log(input.type);
-            switch (input.type) {
-              case 'string':
-                {
-                  data.params[p] = String(data.params[p]);
-                  return next();
+    initialize: function (api, next) {
+        // set action middleware
+        var middleware = {
+            name: 'ah-swagger-material-ui',
+            global: true,
+            preProcessor: function (data, next) {
+                var inputs = data.actionTemplate.inputs;
+                for (var p of Object.keys(inputs)) {
+                    var input = inputs[p];
+                    if (!input.hasOwnProperty('formatter') && input.hasOwnProperty('type') && data.params.hasOwnProperty(p) && (typeof data.params[p] !== input.type)) {
+                        console.log(input.type);
+                        switch (input.type) {
+                            case 'string':
+                            {
+                                data.params[p] = String(data.params[p]);
+                                return next();
+                            }
+                            case 'boolean':
+                            {
+                                var param = data.params[p];
+                                if (typeof param === 'string') {
+                                    data.params[p] = param === 'true';
+                                } else {
+                                    data.params[p] = Boolean(param);
+                                }
+                                return next();
+                            }
+                            case 'number':
+                            {
+                                data.params[p] = Number(data.params[p]);
+                                return next();
+                            }
+                            case 'object':
+                            {
+                                data.params[p] = Object(data.params[p]);
+                                return next();
+                            }
+                            default:
+                                return next(new Error('Unsupported param type: ' + input.type));
+                        }
+                    }
                 }
-              case 'boolean':
-                {
-                  var param = data.params[p];
-                  if (typeof param === 'string') {
-                    data.params[p] = param === 'true';
-                  } else {
-                    data.params[p] = Boolean(param);
-                  }
-                  return next();
-                }
-              case 'number':
-                {
-                  data.params[p] = Number(data.params[p]);
-                  return next();
-                }
-              case 'object':
-                {
-                  data.params[p] = Object(data.params[p]);
-                  return next();
-                }
-              default:
-                return next(new Error('Unsupported param type: ' + input.type));
+                next();
             }
-          }
         }
+
+        api.actions.addMiddleware(middleware);
+
         next();
-      }
     }
-
-    api.actions.addMiddleware(middleware);
-
-    next();
-  }
 };

@@ -9,55 +9,55 @@
 
 
 exports.swagger = {
-  name: 'swagger',
-  description: 'Returns Swagger JSON',
-  summary: 'Swagger Data',
-  responseSchemas: {
-    '200': {
-      description: 'Sample response',
-      schema: {
-        type: 'object',
-        properties: {
-          'swagger': {
-            type: 'string',
-            example: 'Swagger 2.0'
-          }
+    name: 'swagger',
+    description: 'Returns Swagger JSON',
+    summary: 'Swagger Data',
+    responseSchemas: {
+        '200': {
+            description: 'Sample response',
+            schema: {
+                type: 'object',
+                properties: {
+                    'swagger': {
+                        type: 'string',
+                        example: 'Swagger 2.0'
+                    }
+                }
+            }
         }
-      }
-    }
-  },
-  inputs: {
-    secure: {
-      description: 'Whether to use https',
-      required: false,
-      type: 'boolean',
-      default () {
-        return false;
-      }
     },
-    dev: {
-      description: 'Enable dev mode so that each Swagger JSON query will trigger an API doc rebuild',
-      required: false,
-      type: 'boolean',
-      default () {
-        return false;
-      }
-    }
-  },
-  run: function(api, data, next) {
-    if (data.params.dev) {
-      // rebuild Swagger JSON
-      api.swagger.build();
-    }
+    inputs: {
+        secure: {
+            description: 'Whether to use https',
+            required: false,
+            type: 'boolean',
+            default () {
+                return false;
+            }
+        },
+        dev: {
+            description: 'Enable dev mode so that each Swagger JSON query will trigger an API doc rebuild',
+            required: false,
+            type: 'boolean',
+            default () {
+                return false;
+            }
+        }
+    },
+    run: function (api, data, next) {
+        if (data.params.dev) {
+            // rebuild Swagger JSON
+            api.swagger.build();
+        }
 
-    data.response = api.swagger.documentation;
+        data.response = api.swagger.documentation;
 
-    if (data.params.secure) {
-      data.response.schemes = ['https'];
-    } else {
-      data.response.schemes = ['http'];
+        if (data.params.secure) {
+            data.response.schemes = ['https'];
+        } else {
+            data.response.schemes = ['http'];
+        }
+
+        next();
     }
-
-    next();
-  }
 };
